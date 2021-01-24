@@ -112,6 +112,9 @@ zookeeper内写入节点和更新数据的流程如上
 ```
 
 主要内容是利用责任链对请求的线程数进行处理。handle方法用来处理请求
+
+这个方法主要是SoulWebHandler 继承了Spring webflux的WebHandler的handle方法。handle方法中的参数正好就是请求的相关参数，然后我们就可以在插件的执行逻辑内转发和做操作
+
 根据soul-example-springmvc的注解进行请求。可以在抽象的基础AbstractSoulPlugin接受到这个请求
 
 ```
@@ -173,10 +176,12 @@ zookeeper内写入节点和更新数据的流程如上
 ## 问题
 本文还剩下未解决的问题主要是
 * 如何从abstractSoulPlugin执行完之后到WebClientPlugin的相同方法，是责任链模式还是其他的加载过程
+
+> 各个插件执行的时候实际上是责任链模式。请求分发执行的这个方法主要是SoulWebHandler 继承了Spring webflux的WebHandler的handle方法。handle方法中的参数正好就是请求的相关参数，然后我们就可以在插件的执行逻辑内转发和做操作
+
 * abstractSoulPlugin是如何加载注册或修改后的选择器等数据 
 > 可以看到在数据同步的配置中,是由zkClient.subscribeDataChanges来订阅数据的改变操作，从感觉上来说，可能没有websocket那么明显
 
 * plugin 中的执行方法是如何获取到ServerWebExchange的相关请求数据
 
-
-BaseDataCache.SELECTOR_MAP
+> SoulWebHandler 继承了Spring webflux的WebHandler的handle方法,springwebflux内部获取了请求的相关属性放入了ServerWebExchange中
